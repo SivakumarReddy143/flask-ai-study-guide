@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Quiz - AI-Powered Learning Hub</title>
+</head>
+<body>
+    {% include 'base.html' %}
+    <div class="quiz-container">
+        <h1>Generate Your Quiz</h1>
+        <!-- Quiz Generation Form -->
+        <form method="POST" action="{{ url_for('main.quiz') }}" class="quiz-form">
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" name="topic" placeholder="Enter a topic" required>
+
+            <label for="difficulty">Difficulty:</label>
+            <select id="difficulty" name="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <label for="num_questions">Number of Questions:</label>
+            <input type="number" id="num_questions" name="num_questions" min="1" max="50" required>
+
+            <button type="submit">Generate Quiz</button>
+        </form>
+
+        <hr>
+
+        <h2>Interactive Quiz on {{ topic }}</h2>
+        <div id="quiz-content">
+            {% if quiz %}
+                <div class="score-bar" id="score-bar">
+                    Attempted: 0 / {{ quiz|length }} | Score: 0
+                </div>
+                {% for question in quiz %}
+                    <div class="question">
+                        <h3>{{ question.question }}</h3>
+                        {% for option in question.options %}
+                            <div class="option" onclick="selectOption(this, '{{ question.correct_answer }}')">
+                                {{ option }}
+                            </div>
+                        {% endfor %}
+                        <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+                        <div class="answer-section">
+                            <div class="answer-header">Correct Answer</div>
+                            <div class="answer-content">{{ question.correct_answer }}</div>
+                            <div class="explanation">{{ question.explanation }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No quiz available. Please generate a quiz first.</p>
+            {% endif %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

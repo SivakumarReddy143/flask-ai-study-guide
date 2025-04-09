@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Chatbot - AI-Powered Learning Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🤖 Chatbot</h1>
+    <div id="chat-container">
+        <div id="chat-box">
+            <div id="messages">
+                <!-- Display chatbot responses dynamically -->
+                {% if response %}
+                    <div class="message bot-message">
+                        <strong>Bot:</strong> {{ response }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Chatbot Form -->
+        <form method="POST" action="{{ url_for('main.chatbot') }}" id="chat-form">
+            <input type="text" id="user-input" name="user_input" placeholder="Ask your queries..." required />
+            <button type="submit" id="send-button">Send</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

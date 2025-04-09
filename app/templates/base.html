@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>{% block title %}AI-Powered Learning Hub{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!--firbase code -->
+    <!-- Firebase JS SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA2Q_FXrpQfcJfdzxN6IX5R0wmxB9TxAwg",
+    authDomain: "learning-hub-6ef7d.firebaseapp.com",
+    projectId: "learning-hub-6ef7d",
+    storageBucket: "learning-hub-6ef7d.firebasestorage.app",
+    messagingSenderId: "983490369054",
+    appId: "1:983490369054:web:539506b7fbc269c163400f"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+
+</head>
+<body>
+    <header>
+        <h1> AI-Powered Learning Hub </h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a href="{{ url_for('main.quiz') }}">Quiz</a></li>
+                <li><a href="{{ url_for('main.video_resources') }}">Video Resources</a></li>
+                <li><a href="{{ url_for('main.notes') }}">Notes</a></li>
+                <li><a href="{{ url_for('main.chatbot') }}">Chatbot</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

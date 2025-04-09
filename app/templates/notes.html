@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Notes - AI-Powered Learning Hub</title>
+</head>
+<body>
+    {% include 'base.html' %}
+    <div class="container">
+        <h1>📄 Notes</h1>
+        <p>Here you can find notes related to various topics.</p>
+        <div id="notes-content">
+            <!-- Notes content will be dynamically loaded here -->
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
