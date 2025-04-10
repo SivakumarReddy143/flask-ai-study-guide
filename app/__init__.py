@@ -17,7 +17,19 @@ def create_app():
 
     # Load Firebase credentials path from .env
     firebase_cred_path = os.getenv("FIREBASE_CRED_PATH")
-    cred = credentials.Certificate(firebase_cred_path)
+    cred = credentials.Certificate({
+  "type": "service_account",
+  "project_id": "learning-hub-6ef7d",
+  "private_key_id": "b886f1a5724aafaae65f411d949552d86ff76c46",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC1wZ7uo7+BZ0oX\nHqFqNexdH4TEXrWb/7LUxeTic2lxy5MxnM2+j/UUeGUQnGyrFgnrbp1k2m2U0MCC\nJQvjxQubvdpfQYDtxkDa38CGEVpkKVUNEZhfhj7wcov7poIeRFgmOWqC0mAY3kpY\n2eRVQkj7Gb1wcDwZLav6X6+VhAClER0ZR3xf60LQEK1YnrBWbfH4giwlXQe6JL58\nzusLR0tSAQI4505AzKdkufXQsDB0KBdTFw/4l+5A1r00Uzt/tIgOYoJnIe1nbGzU\nhdruXQAaiaJ3cOY1FLqaRHcNoPQkrJI9F66uv/M4AybWxRwnFmNze4E7e30tox6B\nkyeg6KgpAgMBAAECggEAAiz5qpCiO7nRTLqMoxlXJXw5miIqGV5ztRFTXpSUGA0g\nS3E9k0Dk5aRVTWAZ+uhOIRfXYXwt4KCpFUW9QTI8I9afdRFzKiV75ELWaqRtiRJn\nlrr1sHsKaNVuMIp7N0KJLZf1WvCKvvF2QV8GWTDsb7kMp/pn9cMyslIP54HHgjJP\nkJQIUiu2YDWoNZ6bYj1qfL+tRgZYTNGTu1Hqp3QvRqJdI6+3Ur6AeL7zfj1DQyJA\nqGHVMXPTDyGhM6eaZJdSP95D2BWcCsmsz3CbP+K6TaPoMJoFh7ro9jUFTcBLL1Kv\nkOO4QIy7dDNr/i2YPx6gXsumg3vL4R2MbrseFcv7gQKBgQDqv6o8B4DXwLgTeu9N\nUW+anncuol4pJLMYnGULE6OMKTcOs41JXsRkrx93srv+pCUGuyghVXJpmsNjvtBC\nYYM7N/l4Jfm1TvgmVwkuNRYqshwlt5ttzLy43AcNLSuW4Ha0XgVohymG6mm+0I1P\nBX9GNzFE9JSbsVSOlh6GiQyH4QKBgQDGNdmnZZ7w4KvW9g5YdshCvVrE1DYTO0F/\nuwBRaBw/dpI5VmiJi8bs+AkJuIwY4fRyxcjkGhXZ1VSrHCm1V7f1z42E1nb8Fe+X\n3sIenOTgDnUMVBQUzA4IOzolljA0cCSbmnNPCmMGrO0Leq+/2F9Q+6veQJnAEPhl\nu6IMUW8JSQKBgQCiriqiKSz/1715OoOmGF54T4MWnU0VxCodTxyy/WwkkNdn58Rs\n6TC++aGcCRBBGq3SKVdZKmb8ilUHxc97gSo5msPWoLKZFF3h7AUfsYhoFEBvXvtm\nrzDGBy0X04rWpz18J4Al/S0pI0AfDVYwQgX+ufb562klMFIB8kS7RTSa4QKBgQC5\nhFV/lGG7Ws37mLm8mxC9RrXaXDVwspmPj9uwVh16WORrvjCB7M33pf/vlUerUnGV\nqwFoXfHtvPpOXUG8dam87NKsbn9XWsCyCNDwDjE6dM2hCGDzRjosAiNeYsAjlILv\nERSz+ijNarVDdUVh7oboKWan0xcU6c1UitYVaXLf4QKBgFrgbXLbJ0xb86592B8b\nKl9deVjVK90mBEpuwpdb/Q9YyZcaQNDBF0d7+XfGZQ6Gm8JwcKpNQca+MNqcIBOs\ndGKaQxlmYWBcSa6qATrdCssYDfGbZe7HVaDp1GkXEnJGwIh/FPU7175JcpEEPFZA\nIZmfmcOOjbkxC2lhuzWtXAZl\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@learning-hub-6ef7d.iam.gserviceaccount.com",
+  "client_id": "105291519383754702829",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40learning-hub-6ef7d.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+})
     firebase_admin.initialize_app(cred)
 
     # Register blueprints
