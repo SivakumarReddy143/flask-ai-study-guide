@@ -17,7 +17,7 @@ def create_app():
 
     # Load Firebase credentials path from .env
     firebase_cred_path = os.getenv("FIREBASE_CRED_PATH")
-    cred = credentials.Certificate(os.path.dirname(__file__), 'config', 'serviceAccountKey.json')
+    cred = credentials.Certificate("app/config/serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
 
     # Register blueprints
