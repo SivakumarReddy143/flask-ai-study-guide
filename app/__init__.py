@@ -21,7 +21,7 @@ def create_app():
     firebase_admin.initialize_app(cred)
 
     # Register blueprints
-    print("📦 Registering main blueprint...")
+    print("📦 Registering main blueprint....")
     app.register_blueprint(main_blueprint)
 
     return app
