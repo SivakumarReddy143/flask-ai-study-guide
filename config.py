@@ -7,7 +7,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") or "Siva@143"
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
     TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
-    DEBUG = True  # Set to False in production environment
+    DEBUG = True  # Set to False in production environmentdfs
 
 class ProductionConfig(Config):
     """Production configuration."""
