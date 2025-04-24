@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Mock Interview</h1>
+    <p class="lead">Upload your resume to generate a comprehensive mock interview with both technical and non-technical questions.</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Upload Resume</h5>
+                    <form id="resumeForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="resume" class="form-label">Select PDF Resume</label>
+                            <input type="file" class="form-control" id="resume" name="resume" accept=".pdf" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="numQuestions" class="form-label">Number of Questions</label>
+                            <input type="number" class="form-control" id="numQuestions" name="num_questions" min="1" max="20" value="5">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Generate Questions
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card d-none" id="technicalQuestionsCard">
+                <div class="card-body">
+                    <h5 class="card-title">Technical Questions</h5>
+                    <div id="technicalQuestions"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card d-none" id="nonTechnicalQuestionsCard">
+                <div class="card-body">
+                    <h5 class="card-title">Non-Technical Questions</h5>
+                    <div id="nonTechnicalQuestions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('resumeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    const formData = new FormData(this);
+    
+    submitBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/mock-interview', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show technical questions
+            const technicalCard = document.getElementById('technicalQuestionsCard');
+            const technicalQuestions = document.getElementById('technicalQuestions');
+            technicalCard.classList.remove('d-none');
+            technicalQuestions.innerHTML = data.technical_questions;
+            
+            // Show non-technical questions
+            const nonTechnicalCard = document.getElementById('nonTechnicalQuestionsCard');
+            const nonTechnicalQuestions = document.getElementById('nonTechnicalQuestions');
+            nonTechnicalCard.classList.remove('d-none');
+            nonTechnicalQuestions.innerHTML = data.non_technical_questions;
+        } else {
+            alert(data.error || 'An error occurred while generating questions.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while processing your request.');
+    } finally {
+        submitBtn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %} 

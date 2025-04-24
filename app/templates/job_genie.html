@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Genie - Resume Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .options {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .file-input-container {
+            margin: 20px 0;
+        }
+        .file-input-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .file-input-container input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .options-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .option-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+        }
+        .option-item input[type="radio"] {
+            margin-right: 10px;
+        }
+        .option-item label {
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .test-connection {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    {% include 'base.html' %}
+    
+    <div class="container">
+        <h1>Job Genie</h1>
+        
+        <div class="test-connection">
+            <button id="testButton" class="btn">Test Connection</button>
+            <div id="testResult"></div>
+        </div>
+
+        <div class="options-container">
+            <form id="resumeForm" enctype="multipart/form-data">
+                <div class="file-input-container">
+                    <label for="resume">Upload your Resume (PDF only):</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf" required>
+                </div>
+
+                <div class="options">
+                    <h3>Choose an Option:</h3>
+                    <div class="option-item">
+                        <input type="radio" id="resume_evaluation" name="option" value="resume_evaluation" checked>
+                        <label for="resume_evaluation">Resume Evaluation</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" id="job_search" name="option" value="job_search">
+                        <label for="job_search">Job Search</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" id="technical_interview" name="option" value="technical_interview">
+                        <label for="technical_interview">Technical Interview Questions</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" id="non_technical_interview" name="option" value="non_technical_interview">
+                        <label for="non_technical_interview">Non-Technical Interview Questions</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Analyze</button>
+            </form>
+        </div>
+
+        <div id="errorContainer" class="error" style="display: none;"></div>
+        
+        <div id="loadingIndicator" class="loading">
+            <p>Processing your request... Please wait...</p>
+            <div class="spinner"></div>
+        </div>
+
+        <div id="resultContainer" class="result-container" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Test connection first
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const testResult = document.getElementById('testResult');
+            testResult.textContent = 'Testing connection...';
+            
+            try {
+                const response = await fetch('/test');
+                const data = await response.json();
+                testResult.textContent = 'Connection successful: ' + data.message;
+                testResult.style.color = 'green';
+            } catch (error) {
+                testResult.textContent = 'Connection failed: ' + error.message;
+                testResult.style.color = 'red';
+                console.error('Test error:', error);
+            }
+        });
+
+        // Main form submission
+        document.getElementById('resumeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorContainer = document.getElementById('errorContainer');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            // Clear previous results and errors
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+            resultContainer.style.display = 'none';
+            resultContainer.innerHTML = '';
+            
+            // Show loading
+            loadingIndicator.style.display = 'block';
+            
+            try {
+                const formData = new FormData(e.target);
+                
+                const response = await fetch('/job-genie', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Display results
+                if (Array.isArray(data.result)) {
+                    // Handle job search results
+                    const links = data.result
+                        .filter(item => item.url && item.title)
+                        .map(item => `<li><a href="${item.url}" target="_blank">${item.title}</a></li>`)
+                        .join('');
+                    resultContainer.innerHTML = `<ul>${links}</ul>`;
+                } else {
+                    // Handle other results (evaluation, interview questions)
+                    resultContainer.innerHTML = data.result;
+                }
+                resultContainer.style.display = 'block';
+                
+            } catch (error) {
+                errorContainer.textContent = 'Error: ' + error.message;
+                errorContainer.style.display = 'block';
+                console.error('Error:', error);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

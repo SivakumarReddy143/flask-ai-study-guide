@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .upload-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .file-input {
+            margin: 20px 0;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+        }
+        .error {
+            color: #721c24;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'base.html' %}
+    
+    <div class="container">
+        <div class="button-container">
+            <a href="{{ url_for('main.resume_services') }}" class="back-button">← Back to Services</a>
+        </div>
+        <h1>{{ title }}</h1>
+        <div class="upload-container">
+            <form id="uploadForm">
+                <div class="file-input">
+                    <label for="resume">Upload Resume (PDF only):</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn">Analyze</button>
+            </form>
+            
+            <div id="error" class="error"></div>
+            <div id="loading" class="loading">
+                Processing your request...
+                <div class="spinner"></div>
+            </div>
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = new FormData(e.target);
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const error = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            error.style.display = 'none';
+            
+            try {
+                const response = await fetch('{{ endpoint }}', {
+                    method: 'POST',
+                    body: form
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (Array.isArray(data.result)) {
+                    // Handle job search results
+                    const links = data.result
+                        .map(item => `<li><a href="${item.url}" target="_blank">${item.title}</a></li>`)
+                        .join('');
+                    result.innerHTML = `<ul>${links}</ul>`;
+                } else {
+                    // Handle other results
+                    result.innerHTML = data.result;
+                }
+                result.style.display = 'block';
+                
+            } catch (err) {
+                error.textContent = err.message;
+                error.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
