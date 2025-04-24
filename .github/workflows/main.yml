@@ -30,9 +30,9 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPO }}
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .  
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
 
   Continuous-Deployment:
     needs: Continuous-Integration
@@ -53,6 +53,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Stop container if already using port 5000
+        run: |
+          docker ps --filter "publish=5000" -q | xargs -r docker stop
+          docker ps -a --filter "publish=5000" -q | xargs -r docker rm
+
+      - name: Pull latest image
+        run: |
+          docker pull "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
       - name: Run Docker Image to serve users
         run: |
           docker run -d \
@@ -62,4 +71,5 @@ jobs:
             -e GROQ_API_KEY="${{ secrets.GROQ_API_KEY }}" \
             -e HF_TOKEN="${{ secrets.HF_TOKEN }}" \
             -e TAVILY_API_KEY="${{ secrets.TAVILY_API_KEY }}" \
-            -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
+            -p 5000:5000 \
+            "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
