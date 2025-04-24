@@ -53,6 +53,23 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Clean up Docker to free up space
+        run: |
+          docker stop $(docker ps -q) || true
+          docker rm $(docker ps -aq) || true
+          docker system prune -af --volumes || true
+          sudo rm -rf /var/lib/docker/tmp/* || true
+          sudo journalctl --vacuum-time=1d || true
+          df -h
+
+      - name: Pull latest image
+        run: |
+          docker pull "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
+
+      - name: Remove container if already running
+        run: |
+          docker ps -q --filter "ancestor=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest" | grep -q . && docker stop $(docker ps -q --filter "ancestor=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest") && docker rm $(docker ps -aq --filter "ancestor=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest") || echo "No existing container to remove"
+
       - name: Run Docker Image to serve users
         run: |
           docker run -d \
@@ -62,4 +79,5 @@ jobs:
             -e GROQ_API_KEY="${{ secrets.GROQ_API_KEY }}" \
             -e HF_TOKEN="${{ secrets.HF_TOKEN }}" \
             -e TAVILY_API_KEY="${{ secrets.TAVILY_API_KEY }}" \
-            -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
+            -p 5000:5000 \
+            "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest"
