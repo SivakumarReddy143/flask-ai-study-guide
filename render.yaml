@@ -3,10 +3,10 @@ services:
     name: flask-ai-study-guide
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app
+    startCommand: gunicorn app:app
     envVars:
       - key: FLASK_APP
-        value: run.py
+        value: app.py
       - key: FLASK_ENV
         value: production
       - key: GROQ_API_KEY
